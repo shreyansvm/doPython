@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='ASCII'?>
+<default>
+    <dut name='Dut-C'>
+        <var val='' >customer</var>
+        <var val='' >DPI</var>
+        <var val='mgDefault' >PHYSTOPOLOGY</var>
+    </dut>
+</default>
