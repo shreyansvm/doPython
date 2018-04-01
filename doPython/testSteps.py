@@ -1,3 +1,8 @@
+import mmeExp
+
+# TODO : Add inheritance
+# http://python-textbok.readthedocs.io/en/1.0/Object_Oriented_Programming.html
+
 class testStep(object):
     def __init__(self, testStep, mmeGrp, **kwargs):
         self.testStep = testStep
