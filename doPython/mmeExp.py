@@ -10,19 +10,31 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
-
-def addCmdToFile(func):
+'''
+Decorator function to return a unique command for each testStep
+    and respective comment as well
+'''
+def testStepToCmdMap(func):
     def func_wrapper(*args, **kwargs):
-        # print('1st element - ', func(*args, **kwargs)[0])
-        # print('2nd element - ', func(*args, **kwargs)[1])
-        # print('3rd element - ', func(*args, **kwargs)[2])
-        # print('4th element - ', func(*args, **kwargs)[3])
-        if func(*args, **kwargs)[2]:
-            # step command :
-            func(*args, **kwargs)[0].mmeSeqFileObj.write(func(*args, **kwargs)[2] + "\n")
-        if func(*args, **kwargs)[3]:
-            # step comment
-            func(*args, **kwargs)[0].mmeSeqFileObj.write("# " + func(*args, **kwargs)[3] + "\n")
+        mmeObj, testStep = func(*args, **kwargs)
+        if testStep == 'doAttach':
+            return '# Attach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'proc attach group %s\n' % format(mmeObj.mmeGrp)
+
+        elif testStep == 'doDetach':
+            return '# Detach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'proc detach group %s\n' % format(mmeObj.mmeGrp)
+
+        elif testStep == 'idle':
+            return '# Move all IMSIs in group %s to IDLE state\n' % format(mmeObj.mmeGrp) + 'idle group %s\n' % format(mmeObj.mmeGrp)
+
+        elif testStep == 'active':
+            return '# Move all IMSIs in group %s to ACTIVE state\n' % format(mmeObj.mmeGrp) + 'active group %s\n' % format(mmeObj.mmeGrp)
+
+        elif testStep == 'mbCmd':
+            return '# Send MBCMD for all IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'mbcmd group %s\n' % format(mmeObj.mmeGrp)
+
+        else:
+            logger.info('UNKNOWN CMD received %s on MME Grp : %s , SpawnId : %s\n' % (testStep, mmeObj.mmeGrp, mmeObj.spawnId))
+            return '# unknown command on group %s\n' % format(mmeObj.mmeGrp) + 'unknown command on group %s\n' % format(mmeObj.mmeGrp)
     return func_wrapper
 
 '''
@@ -50,8 +62,8 @@ class MmeExp(object):
         for key,value in self.__dict__.iteritems():
             print('%s : %s' % (key, value))
 
-    @addCmdToFile
-    def addTestStep(self, testStep, stepCmds=None, stepComment=None):
+    @testStepToCmdMap
+    def addTestStep(self, testStep):
         logger.info('Adding testStep %s on MME Grp : %s , SpawnId : %s\n' % (testStep, self.mmeGrp, self.spawnId))
         # if stepComment:
         #     #self.mmeSeqFileObj.write("# " + stepComment + "\n")
@@ -59,7 +71,7 @@ class MmeExp(object):
         # if stepCmds:
         #     #self.mmeSeqFileObj.write(stepCmds + "\n")
         #     return self.mmeSeqFileObj, stepCmds
-        return self, testStep, stepCmds, stepComment
+        return self, testStep
         '''
         For each testStep, update corresponding verification objects/methods
         '''
@@ -77,28 +89,25 @@ if __name__ == '__main__':
     def append_mmeGrps(grp):
         return grp
 
-
-
     mmeGrp1 = MmeExp(mmeGrp='1', spawnId='exp32')
     mmeGroups.append(mmeGrp1)
     print(mmeGrp1)
-    mmeGrp1.addTestStep('doAttach', stepCmds='proc attach group 1', stepComment="Attach IMSIs in group 1")
-    mmeGrp1.addTestStep('doDetach', stepCmds='proc detach group 1', stepComment="Detach all IMSIs in group 1")
+    mmeGrp1.mmeSeqFileObj.write(mmeGrp1.addTestStep('doAttach'))
+    mmeGrp1.mmeSeqFileObj.write(mmeGrp1.addTestStep('doDetach'))
 
     mmeGrp2 = MmeExp(mmeGrp='2', spawnId='exp32')
     mmeGroups.append(mmeGrp2)
     print(mmeGrp2)
-    mmeGrp2.addTestStep('doAttach', stepCmds='proc attach group 2', stepComment="Attach IMSIs in group 2")
-    mmeGrp2.addTestStep('mbCmd', stepCmds='proc mbcmd group 2', stepComment="MBCmd on all IMSIs in group 2")
-    mmeGrp2.addTestStep('doDetach', stepCmds='proc detach group 2', stepComment="Detach all IMSIs in group 2")
-
+    mmeGrp2.mmeSeqFileObj.write(mmeGrp2.addTestStep('doAttach'))
+    mmeGrp2.mmeSeqFileObj.write(mmeGrp2.addTestStep('mbCmd'))
+    mmeGrp2.mmeSeqFileObj.write(mmeGrp2.addTestStep('doDetach'))
+    #
     mmeGrp3 = MmeExp(mmeGrp='3', spawnId='exp23')
     #mmeGroups.append(mmeGrp3)
     append_mmeGrps(mmeGrp3)
     print(mmeGrp3)
-    mmeGrp3.addTestStep('doAttach', stepCmds='proc attach group 3', stepComment="Attach IMSIs in group 3")
-    mmeGrp3.addTestStep('idle', stepCmds='idle group 3', stepComment="Move all IMSIs in group 3 to IDLE state")
-    mmeGrp3.addTestStep('active', stepCmds='active group 3', stepComment="Move all IMSIs in group 3 to ACTIVE state")
-    mmeGrp3.addTestStep('doDetach', stepCmds='proc detach group 3', stepComment="Detach all IMSIs in group 3")
-
+    mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('doAttach'))
+    mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('idle'))
+    mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('active'))
+    mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('doDetach'))
     print mmeGroups
