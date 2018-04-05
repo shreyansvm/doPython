@@ -10,6 +10,9 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
+
+
+
 '''
 MME Class
 '''
@@ -48,6 +51,16 @@ class MmeExp(object):
 if __name__ == '__main__':
     mmeGroups = []
 
+    # Trying decorator example
+    def writeGrpCmdsToFile(func):
+        def func_wrapper(*args, **kwargs):
+            mmeGroups.append(func(*args, **kwargs))
+        return func_wrapper
+
+    @writeGrpCmdsToFile
+    def append_mmeGrps(grp):
+        return grp
+
     mmeGrp1 = MmeExp(mmeGrp='1', spawnId='exp32')
     mmeGroups.append(mmeGrp1)
     print(mmeGrp1)
@@ -60,3 +73,14 @@ if __name__ == '__main__':
     mmeGrp2.addTestStep('doAttach', stepCmds='proc attach group 2', stepComment="Attach IMSIs in group 2")
     mmeGrp2.addTestStep('mbCmd', stepCmds='proc mbcmd group 2', stepComment="MBCmd on all IMSIs in group 2")
     mmeGrp2.addTestStep('doDetach', stepCmds='proc detach group 2', stepComment="Detach all IMSIs in group 2")
+
+    mmeGrp3 = MmeExp(mmeGrp='3', spawnId='exp23')
+    #mmeGroups.append(mmeGrp3)
+    append_mmeGrps(mmeGrp3)
+    print(mmeGrp3)
+    mmeGrp3.addTestStep('doAttach', stepCmds='proc attach group 3', stepComment="Attach IMSIs in group 3")
+    mmeGrp3.addTestStep('idle', stepCmds='idle group 3', stepComment="Move all IMSIs in group 3 to IDLE state")
+    mmeGrp3.addTestStep('active', stepCmds='active group 3', stepComment="Move all IMSIs in group 3 to ACTIVE state")
+    mmeGrp3.addTestStep('doDetach', stepCmds='proc detach group 3', stepComment="Detach all IMSIs in group 3")
+
+    print mmeGroups
