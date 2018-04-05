@@ -11,7 +11,19 @@ handler.setFormatter(formatter)
 logger.addHandler(handler)
 
 
-
+def addCmdToFile(func):
+    def func_wrapper(*args, **kwargs):
+        # print('1st element - ', func(*args, **kwargs)[0])
+        # print('2nd element - ', func(*args, **kwargs)[1])
+        # print('3rd element - ', func(*args, **kwargs)[2])
+        # print('4th element - ', func(*args, **kwargs)[3])
+        if func(*args, **kwargs)[2]:
+            # step command :
+            func(*args, **kwargs)[0].mmeSeqFileObj.write(func(*args, **kwargs)[2] + "\n")
+        if func(*args, **kwargs)[3]:
+            # step comment
+            func(*args, **kwargs)[0].mmeSeqFileObj.write("# " + func(*args, **kwargs)[3] + "\n")
+    return func_wrapper
 
 '''
 MME Class
@@ -38,12 +50,16 @@ class MmeExp(object):
         for key,value in self.__dict__.iteritems():
             print('%s : %s' % (key, value))
 
+    @addCmdToFile
     def addTestStep(self, testStep, stepCmds=None, stepComment=None):
         logger.info('Adding testStep %s on MME Grp : %s , SpawnId : %s\n' % (testStep, self.mmeGrp, self.spawnId))
-        if stepComment:
-            self.mmeSeqFileObj.write("# " + stepComment + "\n")
-        if stepCmds:
-            self.mmeSeqFileObj.write(stepCmds + "\n")
+        # if stepComment:
+        #     #self.mmeSeqFileObj.write("# " + stepComment + "\n")
+        #     return self.mmeSeqFileObj, stepComment
+        # if stepCmds:
+        #     #self.mmeSeqFileObj.write(stepCmds + "\n")
+        #     return self.mmeSeqFileObj, stepCmds
+        return self, testStep, stepCmds, stepComment
         '''
         For each testStep, update corresponding verification objects/methods
         '''
@@ -60,6 +76,8 @@ if __name__ == '__main__':
     @writeGrpCmdsToFile
     def append_mmeGrps(grp):
         return grp
+
+
 
     mmeGrp1 = MmeExp(mmeGrp='1', spawnId='exp32')
     mmeGroups.append(mmeGrp1)
