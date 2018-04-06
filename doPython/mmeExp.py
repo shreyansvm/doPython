@@ -17,24 +17,33 @@ Decorator function to return a unique command for each testStep
 def testStepToCmdMap(func):
     def func_wrapper(*args, **kwargs):
         mmeObj, testStep = func(*args, **kwargs)
+
+        ''' Return format : stepComment + stepCommand '''
+
         if testStep == 'doAttach':
-            return '# Attach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'proc attach group %s\n' % format(mmeObj.mmeGrp)
+            return '# Attach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + \
+                   'proc attach group %s\n' % format(mmeObj.mmeGrp)
 
         elif testStep == 'doDetach':
-            return '# Detach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'proc detach group %s\n' % format(mmeObj.mmeGrp)
+            return '# Detach IMSIs in group %s\n' % format(mmeObj.mmeGrp) + \
+                   'proc detach group %s\n' % format(mmeObj.mmeGrp)
 
         elif testStep == 'idle':
-            return '# Move all IMSIs in group %s to IDLE state\n' % format(mmeObj.mmeGrp) + 'idle group %s\n' % format(mmeObj.mmeGrp)
+            return '# Move all IMSIs in group %s to IDLE state\n' % format(mmeObj.mmeGrp) + \
+                   'idle group %s\n' % format(mmeObj.mmeGrp)
 
         elif testStep == 'active':
-            return '# Move all IMSIs in group %s to ACTIVE state\n' % format(mmeObj.mmeGrp) + 'active group %s\n' % format(mmeObj.mmeGrp)
+            return '# Move all IMSIs in group %s to ACTIVE state\n' % format(mmeObj.mmeGrp) + \
+                   'active group %s\n' % format(mmeObj.mmeGrp)
 
         elif testStep == 'mbCmd':
-            return '# Send MBCMD for all IMSIs in group %s\n' % format(mmeObj.mmeGrp) + 'mbcmd group %s\n' % format(mmeObj.mmeGrp)
+            return '# Send MBCMD for all IMSIs in group %s\n' % format(mmeObj.mmeGrp) + \
+                   'mbcmd group %s\n' % format(mmeObj.mmeGrp)
 
         else:
             logger.info('UNKNOWN CMD received %s on MME Grp : %s , SpawnId : %s\n' % (testStep, mmeObj.mmeGrp, mmeObj.spawnId))
-            return '# unknown command on group %s\n' % format(mmeObj.mmeGrp) + 'unknown command on group %s\n' % format(mmeObj.mmeGrp)
+            return '# unknown command on group %s\n' % format(mmeObj.mmeGrp) + \
+                   'unknown command on group %s\n' % format(mmeObj.mmeGrp)
     return func_wrapper
 
 '''
@@ -50,17 +59,26 @@ class MmeExp(object):
                 raise ValueError("%s is not a valid variable of class MmeExp." % key)
         self.mmeSeqFile = "mmeGrp" + self.mmeGrp + "CmdSeq.txt"
         self.mmeSeqFileObj = open(self.mmeSeqFile,'w')
+
         # IMSI Range : 123456789010000 , 123456789020000 ..
         self.mmeImsiRange = int("1234567890" + self.mmeGrp + "0000")
+        self.cfgFile = 'mmeCfg.file'
+        self.logFile = 'mmeLog.file'
 
     def __str__(self):
         # TODO : As more variables are added, update the return string
         return "MME Grp : %s,\n\t on SpawnId : %s\n\t IMSI range : %s\n" % (self.mmeGrp, self.spawnId, self.mmeImsiRange)
 
-    def printMmeMgExpress(self):
+    def setProfileParams(self):
+        print(' -- Set mme group / profile level params -- ')
+
+    def printMmeExpClassParams(self):
         print('MmeExp class object - ')
         for key,value in self.__dict__.iteritems():
             print('%s : %s' % (key, value))
+
+    def printMmeGrpStats(selfs):
+        print(' -- later add method to print all stats for each mme grp -- ')
 
     @testStepToCmdMap
     def addTestStep(self, testStep):
@@ -72,9 +90,13 @@ class MmeExp(object):
         #     #self.mmeSeqFileObj.write(stepCmds + "\n")
         #     return self.mmeSeqFileObj, stepCmds
         return self, testStep
-        '''
-        For each testStep, update corresponding verification objects/methods
-        '''
+        ''' For each testStep, update corresponding verification objects/methods '''
+
+    def execFile(self):
+        print(' -- execute file -- ')
+
+    def command(self):
+        print(' -- specific command -- ')
 
 if __name__ == '__main__':
     mmeGroups = []
