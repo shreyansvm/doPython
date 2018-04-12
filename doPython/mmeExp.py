@@ -10,6 +10,8 @@ handler.setFormatter(formatter)
 # add the handlers to the logger
 logger.addHandler(handler)
 
+mmeGroups = []
+
 '''
 Decorator function to return a unique command for each testStep
     and respective comment as well
@@ -77,7 +79,13 @@ class MmeExp(object):
         for key,value in self.__dict__.iteritems():
             print('%s : %s' % (key, value))
 
-    def printMmeGrpStats(selfs):
+    def returnMmeExpClassParams(self):
+        param = {}
+        for key, value in self.__dict__.iteritems():
+            param[key] = value
+        return param
+
+    def printMmeGrpStats(self):
         print(' -- later add method to print all stats for each mme grp -- ')
 
     @testStepToCmdMap
@@ -98,8 +106,28 @@ class MmeExp(object):
     def command(self):
         print(' -- specific command -- ')
 
+
+class Verification(MmeExp):
+    def __init__(self, MmeExp):
+        print('--- creating Verification class object, using MmeExp object : ', MmeExp)
+        self.mmeGrpObj = MmeExp
+
+    def __str__(self):
+        print(self.mmeGrpObj)
+        return "--- printing Verification class object ---- "
+
+    def verify_type_A(self):
+        params = self.mmeGrpObj.returnMmeExpClassParams()
+        print('\t--- verifying type_A')
+
+    def verify_type_B(self):
+        print('\t--- verifying type_B')
+
+    def verify_type_C(self):
+        print('\t--- verifying type_C')
+
+
 if __name__ == '__main__':
-    mmeGroups = []
 
     # Trying decorator example
     def writeGrpCmdsToFile(func):
@@ -113,6 +141,7 @@ if __name__ == '__main__':
 
     mmeGrp1 = MmeExp(mmeGrp='1', spawnId='exp32')
     mmeGroups.append(mmeGrp1)
+    # mmeGrp1.printMmeExpClassParams()
     print(mmeGrp1)
     mmeGrp1.mmeSeqFileObj.write(mmeGrp1.addTestStep('doAttach'))
     mmeGrp1.mmeSeqFileObj.write(mmeGrp1.addTestStep('doDetach'))
@@ -132,4 +161,9 @@ if __name__ == '__main__':
     mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('idle'))
     mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('active'))
     mmeGrp3.mmeSeqFileObj.write(mmeGrp3.addTestStep('doDetach'))
+
     print mmeGroups
+
+    typeA = Verification(mmeGroups[0])
+    print(typeA)
+    typeA.verify_type_A()
