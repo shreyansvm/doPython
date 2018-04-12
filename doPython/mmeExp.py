@@ -106,11 +106,20 @@ class MmeExp(object):
     def command(self):
         print(' -- specific command -- ')
 
+''' Class for writing verification / debug logs '''
+class VerificationLogs(object):
+    def __init__(self):
+        self.logfile = "log1.txt"
 
+    def __str__(self):
+        return "Verification logs are in : %s" % (self.logfile)
+
+''' Class for verifying events for each MME Grp '''
 class Verification(MmeExp):
     def __init__(self, MmeExp):
         print('--- creating Verification class object, using MmeExp object : ', MmeExp)
         self.mmeGrpObj = MmeExp
+        self.verificationType = ['type_A', 'type_B', 'type_C']
 
     def __str__(self):
         print(self.mmeGrpObj)
@@ -118,13 +127,22 @@ class Verification(MmeExp):
 
     def verify_type_A(self):
         params = self.mmeGrpObj.returnMmeExpClassParams()
-        print('\t--- verifying type_A')
+        print('\t\t ----- verification type : type_A')
 
     def verify_type_B(self):
-        print('\t--- verifying type_B')
+        print('\t\t ----- verification type : type_B')
 
     def verify_type_C(self):
-        print('\t--- verifying type_C')
+        print('\t\t ----- verification type : type_C')
+
+    def verifyAll(self):
+        for type in self.verificationType:
+            if type == 'type_A':
+                self.verify_type_A()
+            elif type == 'type_B':
+                self.verify_type_B()
+            elif type == 'type_C':
+                self.verify_type_C()
 
 
 if __name__ == '__main__':
@@ -166,4 +184,7 @@ if __name__ == '__main__':
 
     typeA = Verification(mmeGroups[0])
     print(typeA)
-    typeA.verify_type_A()
+    typeA.verifyAll()
+
+    logA = VerificationLogs()
+    print(logA)
