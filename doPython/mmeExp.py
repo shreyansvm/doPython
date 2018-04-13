@@ -1,3 +1,5 @@
+import threading
+import time
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -146,6 +148,7 @@ class Verification(MmeExp):
     def verify_type_C(self):
         print('\t\t ----- verification type : type_C')
 
+    ''' One way of verifying '''
     def verifyAll(self):
         for type in self.verificationType:
             if type == 'type_A':
@@ -154,7 +157,6 @@ class Verification(MmeExp):
                 self.verify_type_B()
             elif type == 'type_C':
                 self.verify_type_C()
-
 
 if __name__ == '__main__':
 
@@ -196,6 +198,12 @@ if __name__ == '__main__':
     typeA = Verification(mmeGroups[0])
     print(typeA)
     typeA.verifyAll()
-
     logA = VerificationLogs(mmeGroups[0])
     print(logA)
+
+    mmeGrpsTh = []
+    for i in range(50):
+        mmeGrpsTh.append(MmeExp(mmeGrp=str(i), spawnId=str(i)))
+
+    for mme in mmeGrpsTh:
+        print('mme - ', mme)
