@@ -290,26 +290,6 @@ if __name__ == '__main__':
     print("Execution time with multiprocessing, using 2 pools = {0:.5f}".format(endMp2 - startMp2))
     print("Execution time with multiprocessing, using 3 pools = {0:.5f}".format(endMp3 - startMp3))
 
-    """ For mme grps, verify A,B and C for each grp. without threading """
-    # Without threads
-    # mmeGrps = []
-    # for i in range(50):
-    #     # creates and store all MmeExp class objects
-    #     mmeGrps.append(MmeExp(mmeGrp=str(i), spawnId=str(i)))
-
-    # start = time.time()
-    # for mme in mmeGrps:
-    #     print('mme - ', mme)
-    #     verifyMme = Verification(mme)
-    #     verifyMme.verify_type_A()
-    #     verifyMme.verify_type_B()
-    #     verifyMme.verify_type_C()
-
-    # end = time.time()
-    # print("Execution time without threading = {0:.5f}".format(end - start))
-
-    """ Another type of verification : for mme grps, verify A,B and C for each grp. with threading """
-    print(' ####### ####### ####### ')
     # With threads
     # mmeGrpsTh = []
     # for i in range(50):
