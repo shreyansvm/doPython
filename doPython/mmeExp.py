@@ -67,6 +67,9 @@ class MmeExp(object):
         self.cfgFile = 'mmeCfg.file'
         self.logFile = 'mmeLog.file'
 
+    def returnMmeGrpId(self):
+        return self.mmeGrp
+
     def __str__(self):
         # TODO : As more variables are added, update the return string
         return "MME Grp : %s,\n\t on SpawnId : %s\n\t IMSI range : %s\n" % (self.mmeGrp, self.spawnId, self.mmeImsiRange)
@@ -106,21 +109,29 @@ class MmeExp(object):
     def command(self):
         print(' -- specific command -- ')
 
+
 ''' Class for writing verification / debug logs '''
-class VerificationLogs(object):
-    def __init__(self):
-        self.logfile = "log1.txt"
+class VerificationLogs(MmeExp):
+    def __init__(self, MmeExp):
+        self.logfile = "mmeGrp_" + str(MmeExp.returnMmeGrpId()) + "_log1.txt"
+        self.logfileObj = open(self.logfile,'w')
 
     def __str__(self):
         return "Verification logs are in : %s" % (self.logfile)
+
+    def returnLogFileNameAndObj(self):
+        return self.logfile, self.logfileObj
+
 
 ''' Class for verifying events for each MME Grp '''
 class Verification(MmeExp):
     def __init__(self, MmeExp):
         print('--- creating Verification class object, using MmeExp object : ', MmeExp)
         self.mmeGrpObj = MmeExp
+        logFileObj = VerificationLogs(MmeExp)
+        self.logfile, self.logfileObj = logFileObj.returnLogFileNameAndObj()
         self.verificationType = ['type_A', 'type_B', 'type_C']
-
+ 
     def __str__(self):
         print(self.mmeGrpObj)
         return "--- printing Verification class object ---- "
@@ -186,5 +197,5 @@ if __name__ == '__main__':
     print(typeA)
     typeA.verifyAll()
 
-    logA = VerificationLogs()
+    logA = VerificationLogs(mmeGroups[0])
     print(logA)
