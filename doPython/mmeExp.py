@@ -1,6 +1,10 @@
 import threading
 import time
 import logging
+
+from multiprocessing import Pool
+from contextlib import closing
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 # create a file handler
@@ -125,6 +129,14 @@ class VerificationLogs(MmeExp):
         return self.logfile, self.logfileObj
 
 
+# Verification using multiprocessing
+def verifyMp_type(type):
+    print('\t\t ----- verification type : ', type)
+    time.sleep(10)
+    return
+
+
+
 ''' Class for verifying events for each MME Grp '''
 class Verification(MmeExp):
     def __init__(self, MmeExp):
@@ -141,12 +153,15 @@ class Verification(MmeExp):
     def verify_type_A(self):
         params = self.mmeGrpObj.returnMmeExpClassParams()
         print('\t\t ----- verification type : type_A')
+        time.sleep(10)
 
     def verify_type_B(self):
         print('\t\t ----- verification type : type_B')
+        time.sleep(10)
 
     def verify_type_C(self):
         print('\t\t ----- verification type : type_C')
+        time.sleep(10)
 
     ''' One way of verifying '''
     def verifyAll(self):
@@ -157,6 +172,53 @@ class Verification(MmeExp):
                 self.verify_type_B()
             elif type == 'type_C':
                 self.verify_type_C()
+
+    # type_A Verification using threads
+    def verifyTh_type_A(self):
+        params = self.mmeGrpObj.returnMmeExpClassParams()
+        print('\t\t ----- verification type : type_A')
+        print threading.currentThread().getName(), 'Starting : type_A verification'
+        time.sleep(0.3)
+        print threading.currentThread().getName(), 'Exiting : type_A verification'
+
+    # type_B Verification using threads
+    def verifyTh_type_B(self):
+        print('\t\t ----- verification type : type_B')
+        print threading.currentThread().getName(), 'Starting : type_B verification'
+        time.sleep(0.3)
+        print threading.currentThread().getName(), 'Exiting : type_B verification'
+
+    # type_C verification using threads
+    def verifyTh_type_C(self):
+        print('\t\t ----- verification type : type_C')
+        print threading.currentThread().getName(), 'Starting : type_C verification'
+        time.sleep(0.3)
+        print threading.currentThread().getName(), 'Exiting : type_C verification'
+
+    ''' Another way of verifying all types ... using threading '''
+    def verifyThAll(self):
+        for type in self.verificationType:
+            if type == 'type_A':
+                self.verifyTh_type_A()
+            elif type == 'type_B':
+                self.verifyTh_type_B()
+            elif type == 'type_C':
+                self.verifyTh_type_C()
+
+    ''' Another way of verifying all types ... using multiprocessing '''
+    def verifyMpAll(self):
+        p = Pool(1)
+        print('Pool p : ',p)
+        _types = []
+        for type in self.verificationType:
+            if type == 'type_A':
+                _types.append('type_A')
+            elif type == 'type_B':
+                _types.append('type_B')
+            elif type == 'type_C':
+                _types.append('type_C')
+        
+        return p.map(verifyMp_type, ['type_A', 'type_B', 'type_C'])
 
 if __name__ == '__main__':
 
@@ -195,15 +257,59 @@ if __name__ == '__main__':
 
     print mmeGroups
 
+    # start = time.time()
+    # typeA = Verification(mmeGroups[0])
+    # print(typeA)
+    # typeA.verifyAll()
+    # end = time.time()
+    # print("Execution time = {0:.5f}".format(end - start))
+    
+    # logA = VerificationLogs(mmeGroups[0])
+    # print(logA)
+
+    # Using Multiprocessing
+    startMp = time.time()
     typeA = Verification(mmeGroups[0])
     print(typeA)
-    typeA.verifyAll()
-    logA = VerificationLogs(mmeGroups[0])
-    print(logA)
+    typeA.verifyMpAll()
+    endMp = time.time()
+    print("Execution time with multiprocessing = {0:.5f}".format(endMp - startMp))
 
-    mmeGrpsTh = []
-    for i in range(50):
-        mmeGrpsTh.append(MmeExp(mmeGrp=str(i), spawnId=str(i)))
+    """ For mme grps, verify A,B and C for each grp. without threading """
+    # Without threads
+    # mmeGrps = []
+    # for i in range(50):
+    #     # creates and store all MmeExp class objects
+    #     mmeGrps.append(MmeExp(mmeGrp=str(i), spawnId=str(i)))
 
-    for mme in mmeGrpsTh:
-        print('mme - ', mme)
+    # start = time.time()
+    # for mme in mmeGrps:
+    #     print('mme - ', mme)
+    #     verifyMme = Verification(mme)
+    #     verifyMme.verify_type_A()
+    #     verifyMme.verify_type_B()
+    #     verifyMme.verify_type_C()
+
+    # end = time.time()
+    # print("Execution time without threading = {0:.5f}".format(end - start))
+
+    """ Another type of verification : for mme grps, verify A,B and C for each grp. with threading """
+    print(' ####### ####### ####### ')
+    # With threads
+    # mmeGrpsTh = []
+    # for i in range(50):
+    #     # creates and store all MmeExp class objects
+    #     mmeGrpsTh.append(MmeExp(mmeGrp=str(i), spawnId=str(i)))
+
+    # [Shreyans] : Didn't work as expected
+    # startTh = time.time()
+    # i = 0
+    # for mme in mmeGrps:
+    #     print('mme - ', mme)
+    #     verifyMme = Verification(mme)
+    #     globals()['vTypeAllTh%s' % i] = threading.Thread(name='mme_verify_type_A', target=verifyMme.verifyAll())
+    #     globals()['vTypeAllTh%s' % i].start()
+    #     i = i + 1
+    # endTh = time.time()
+    # print("Execution time with threading = {0:.5f}".format(endTh - startTh))
+
