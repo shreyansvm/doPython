@@ -1,8 +1,11 @@
 <?xml version='1.0' encoding='ASCII'?>
 <default>
-    <dut name='Dut-C'>
-        <var val='' >customer</var>
-        <var val='' >DPI</var>
-        <var val='mgDefault' >PHYSTOPOLOGY</var>
+    <dut name='Dut'>
+        <var val='PHYSTOPOLOGY' >lteDefault</var>
+        <var val='SUBTOPOLOGY' >ismMgV3</var>
+        <var val='customer' >ABC</var>
+        <var val='dpi' >Disable</var>
+        <var val='icr' >Enable</var>
+        <var val='trap' >Disable</var>
     </dut>
 </default>
